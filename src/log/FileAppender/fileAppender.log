@@ -1,0 +1,2 @@
+[WARN][2020-08-26 14:59:40 388][org.apache.hadoop.util.NativeCodeLoader]-[Unable to load native-hadoop library for your platform... using builtin-java classes where applicable]
+[WARN][2020-08-26 14:59:41 298][org.apache.hadoop.io.retry.RetryInvocationHandler]-[A failover has occurred since the start of call #1 ClientNamenodeProtocolTranslatorPB.getFileInfo over /192.168.163.72:8020]
