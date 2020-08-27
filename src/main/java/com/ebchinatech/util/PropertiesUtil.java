@@ -6,11 +6,4 @@ public class PropertiesUtil {
     public static String  getValue(String key) {
        return pro.getString(key);
     }
-    public static String  setValue(String key) {
-        return pro.getString(key);
-    }
-
-
-
-
 }

@@ -5,8 +5,6 @@ import org.apache.commons.lang.StringUtils;
 import org.slf4j.Logger;
 
 import java.io.*;
-import java.util.concurrent.ThreadPoolExecutor;
-import java.util.concurrent.atomic.AtomicBoolean;
 
 
 public class SSH2Util {
@@ -136,12 +134,9 @@ public class SSH2Util {
         this.initialSession();
         InputStream in = null;
         InputStream err = null;
-        //  BufferedReader inReader = null;
-        //  BufferedReader errReader = null;
         int time = 0;
-        boolean run = false;
-//        AtomicBoolean run2 = new AtomicBoolean(false);
-        StringBuffer sb = new StringBuffer();
+        boolean flagIn = false;
+        boolean flagErr = false;
 
         //执行命令
         ChannelExec channel = (ChannelExec) session.openChannel("exec");
@@ -153,52 +148,47 @@ public class SSH2Util {
         channel.setErrStream(null);
 
         //输入流信息
-       // err = channel.getErrStream();
         in = channel.getInputStream();
+        //error信息
+        err = channel.getErrStream();
         channel.connect();
-
         logger.info("执行脚本{}", command);
-
         BufferedReader inReader = new BufferedReader(new InputStreamReader(in, "UTF-8"));
-
-        // BufferedReader errReader = new BufferedReader(new InputStreamReader(err, "UTF-8"));
-
-        String s = null;
+        BufferedReader errReader = new BufferedReader(new InputStreamReader(err, "UTF-8"));
+        String sin = null;
         while (true) {
             try {
-                s = inReader.readLine();
+                sin = inReader.readLine();
             } catch (IOException e) {
                 e.printStackTrace();
                 logger.error(e.getMessage());
             }
-            if (StringUtils.isNotEmpty(s) || s != null) {
-                logger.info(s);
+            if (StringUtils.isNotEmpty(sin) || sin != null) {
+                logger.info(sin);
             } else {
-                run = true;
+                flagIn = true;
+                break;
+            }
+        }
+        String serr = null;
+        while (true) {
+            try {
+                serr = errReader.readLine();
+            } catch (IOException e) {
+                e.printStackTrace();
+                logger.error(e.getMessage());
+            }
+            if (StringUtils.isNotEmpty(serr) || serr != null) {
+                logger.info(serr);
+            } else {
+                flagErr = true;
                 break;
             }
         }
 
 
-//        String s2 = null;
-//        while (true) {
-//            try {
-//                s2 = errReader.readLine();
-//            } catch (IOException e) {
-//                e.printStackTrace();
-//            }
-//            if (StringUtils.isNotEmpty(s2) || s2 != null) {
-//                logger.info(s2);
-//                logger.error(s2);
-//            } else {
-//                run2.set(true);
-//                break;
-//            }
-//        }
-
-
         while (true) {
-            if (channel.isClosed() || run) {
+            if (channel.isClosed() || (flagErr && flagIn == true)) {
                 break;
             }
             try {
@@ -211,11 +201,10 @@ public class SSH2Util {
             time++;
         }
 
-
-        //  System.out.println("inReader=" + run.get() + "errReader=" + run2.get());
-
+        in.close();
+        err.close();
         inReader.close();
-        // errReader.close();
+        errReader.close();
         channel.disconnect();
         session.disconnect();
         //输出的结果

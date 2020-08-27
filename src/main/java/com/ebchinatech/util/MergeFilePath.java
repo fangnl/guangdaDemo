@@ -18,7 +18,7 @@ public class MergeFilePath {
     //一共几个executor  --num-executors
     private String numExecutors;
     //并行度的设置 spark.default.parallelism
-    private String parallelism = "3";
+    private String parallelism;
     // spark.executor.memoryOverhead 对executor堆内存的设置
     private String executorMemoryOverhead;
     //spark.dynamicAllocation.enabled 是否自动调整资源
@@ -117,32 +117,45 @@ public class MergeFilePath {
     }
 
     private void creatAndExecuteShell(String paths, String outPath, int index) throws Exception {
+
         String shellPath = PropertiesUtil.getValue(MergeFileConstant.SHELL_PATH);
         //根据文件的元数据调整spark资源的情况
         //todo
         StringBuffer command = new StringBuffer();
         command.append("source /etc/profile" + "\n");
         command.append("cd /opt/spark-2.3.1/bin/" + "\n");
-        command.append(PropertiesUtil.getValue("shell.spark.submit.command")).append(" ");
-        command.append(PropertiesUtil.getValue("shell.spark.mainClass")).append(" ");
-        command.append("--driver-memory ").append(PropertiesUtil.getValue("spark.driver-memory")).append(" ");
-        command.append("--executor-memory ").append(PropertiesUtil.getValue("spark.executor-memory")).append(" ");
-        command.append("--executor-cores ").append(PropertiesUtil.getValue("spark.executor-cores")).append(" ");
-        command.append("--num-executors ").append(PropertiesUtil.getValue("spark.num-executors")).append(" ");
-        command.append("--conf spark.default.parallelism=").append(parallelism).append(" ");
-        command.append(PropertiesUtil.getValue("shell.spark.jar.location")).append(" ").append(paths).append(" ").append(outPath);
+        command.append(PropertiesUtil.getValue(MergeFileConstant.SPARK_SUBMIT_COMMAND)).append(" ");
+        command.append(PropertiesUtil.getValue(MergeFileConstant.MAIN_CLASS)).append(" ");
+        command.append("--" + MergeFileConstant.DRIVER_MEMORY + " ").append(PropertiesUtil.getValue(MergeFileConstant.DRIVER_MEMORY)).append(" ");
+        command.append("--" + MergeFileConstant.EXECUTOR_MEMORY + " ").append(PropertiesUtil.getValue(MergeFileConstant.EXECUTOR_MEMORY)).append(" ");
+        command.append("--" + MergeFileConstant.EXECUTOR_CORES + " ").append(PropertiesUtil.getValue(MergeFileConstant.EXECUTOR_CORES)).append(" ");
+        // command.append("--conf " + MergeFileConstant.SCHEDULER_MODEL + "=").append("FAIR").append(" "); //yarn集群配置并行执行之后这个不用配置
+        boolean dynamic = Boolean.parseBoolean(PropertiesUtil.getValue(MergeFileConstant.DYNAMIC_SWITCH));
+        if (!dynamic) {
+            //手动配置
+            command.append("--" + MergeFileConstant.NUM_EXECUTORS + " ").append(PropertiesUtil.getValue(MergeFileConstant.NUM_EXECUTORS)).append(" ");
+        } else {
+            //动态资源分配
+            command.append("--conf " + MergeFileConstant.DYNAMIC_ALLOCATION + "=").append("true").append(" ");
+            command.append("--conf " + MergeFileConstant.SHUFFLE_SERVICE_ENABLE + "=").append("true").append(" ");
+            command.append("--conf " + MergeFileConstant.MAX_EXECUTORS + "=").append(PropertiesUtil.getValue(MergeFileConstant.MAX_EXECUTORS)).append(" ");
+            command.append("--conf " + MergeFileConstant.MIN_EXECUTORS + "=").append(MergeFileConstant.MIN_EXECUTORS).append(" ");
+        }
+        command.append("--conf " + MergeFileConstant.PARALLELISM + "=").append(PropertiesUtil.getValue(MergeFileConstant.PARALLELISM)).append(" ");
+        command.append(PropertiesUtil.getValue(MergeFileConstant.JAR_LOCATION)).append(" ").append(paths).append(" ").append(outPath);
         logger.info("连接Linux调用工具类");
         SSH2Util ssh2Util = new SSH2Util(PropertiesUtil.getValue("linux.host"), PropertiesUtil.getValue("linux.userName"), PropertiesUtil.getValue("linux.password"), 22);
         //上传脚本文件  shellpath.sh加上index值
         StringBuilder stringBuffer = new StringBuilder(shellPath);
         shellPath = stringBuffer.insert(shellPath.indexOf(".sh"), index).toString();
-
         logger.info("shell脚本被写到路径->{}", shellPath);
+        //向Linux写入脚本
         ssh2Util.putFile(command.toString(), shellPath);
         logger.info("创建{}脚本成功,脚本命令->{}", shellPath, command);
         //执行脚本
-        ssh2Util.runCommand("sh " + shellPath);
+        //  ssh2Util.runCommand("sh " + shellPath);
         logger.info("执行脚本->{}成功", shellPath);
+        //关闭连接
         ssh2Util.close();
         logger.info("关闭Linux连接");
     }
