@@ -1,4 +1,4 @@
-package com.ebchinatech.util;
+package com.datah.util;
 import java.util.ResourceBundle;
 
 public class PropertiesUtil {

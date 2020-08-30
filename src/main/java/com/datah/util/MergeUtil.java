@@ -1,4 +1,4 @@
-package com.ebchinatech.util;
+package com.datah.util;
 
 import org.apache.commons.lang.StringUtils;
 import org.apache.hadoop.conf.Configuration;
@@ -50,7 +50,6 @@ public class MergeUtil {
 
 
     public static void merge(String paths, String outPath) {
-
         System.setProperty("HADOOP_USER_NAME", "root");
         logger.info("输入路径:{},输出路径:{}", paths, outPath);
         MergeFilePath mergeFilePath = new MergeFilePath();

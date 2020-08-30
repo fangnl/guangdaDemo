@@ -1,4 +1,4 @@
-package com.ebchinatech.util;
+package com.datah.util;
 
 import org.apache.hadoop.fs.*;
 import org.apache.hadoop.io.IOUtils;
@@ -7,6 +7,7 @@ import org.slf4j.Logger;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.MissingResourceException;
 
 public class MergeFilePath {
     //driver的内存 --driver-memory
@@ -139,7 +140,14 @@ public class MergeFilePath {
             command.append("--conf " + MergeFileConstant.DYNAMIC_ALLOCATION + "=").append("true").append(" ");
             command.append("--conf " + MergeFileConstant.SHUFFLE_SERVICE_ENABLE + "=").append("true").append(" ");
             command.append("--conf " + MergeFileConstant.MAX_EXECUTORS + "=").append(PropertiesUtil.getValue(MergeFileConstant.MAX_EXECUTORS)).append(" ");
-            command.append("--conf " + MergeFileConstant.MIN_EXECUTORS + "=").append(MergeFileConstant.MIN_EXECUTORS).append(" ");
+            command.append("--conf " + MergeFileConstant.MIN_EXECUTORS + "=").append(PropertiesUtil.getValue(MergeFileConstant.MIN_EXECUTORS)).append(" ");
+        }
+        try {
+            command.append("--conf " + MergeFileConstant.SPLIT_MAXSIZE + "=").append(PropertiesUtil.getValue(MergeFileConstant.SPLIT_MAXSIZE)).append(" ");
+        } catch (MissingResourceException e) {
+            logger.info(e.getMessage());
+            String substring = command.substring(0, command.lastIndexOf("--conf"));
+            command = new StringBuffer(substring);
         }
         command.append("--conf " + MergeFileConstant.PARALLELISM + "=").append(PropertiesUtil.getValue(MergeFileConstant.PARALLELISM)).append(" ");
         command.append(PropertiesUtil.getValue(MergeFileConstant.JAR_LOCATION)).append(" ").append(paths).append(" ").append(outPath);
@@ -153,7 +161,7 @@ public class MergeFilePath {
         ssh2Util.putFile(command.toString(), shellPath);
         logger.info("创建{}脚本成功,脚本命令->{}", shellPath, command);
         //执行脚本
-        //  ssh2Util.runCommand("sh " + shellPath);
+        ssh2Util.runCommand("sh " + shellPath);
         logger.info("执行脚本->{}成功", shellPath);
         //关闭连接
         ssh2Util.close();

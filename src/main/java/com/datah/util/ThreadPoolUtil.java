@@ -1,8 +1,7 @@
-package com.ebchinatech.util;
+package com.datah.util;
 
 import org.slf4j.Logger;
 
-import java.util.List;
 import java.util.concurrent.LinkedBlockingQueue;
 import java.util.concurrent.ThreadPoolExecutor;
 import java.util.concurrent.TimeUnit;

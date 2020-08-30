@@ -131,12 +131,15 @@
                     <descriptorRefs>
                         <descriptorRef>jar-with-dependencies</descriptorRef>
                     </descriptorRefs>
+
                     <archive>
                         <manifest>
                             <mainClass>com.lw.scalaspark.core.examples.ExecuteLinuxShell</mainClass>
                         </manifest>
                     </archive>
+
                 </configuration>
+
                 <executions>
                     <execution>
                         <id>make-assembly</id>
@@ -146,6 +149,7 @@
                         </goals>
                     </execution>
                 </executions>
+
             </plugin>
         </plugins>
 

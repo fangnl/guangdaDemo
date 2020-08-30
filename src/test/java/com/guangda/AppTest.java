@@ -2,8 +2,6 @@ package com.guangda;
 
 import static org.junit.Assert.assertTrue;
 
-import com.ebchinatech.util.MergeException;
-import com.ebchinatech.util.MergeUtil;
 import org.junit.Test;
 
 /**

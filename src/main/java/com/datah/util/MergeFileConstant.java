@@ -1,10 +1,12 @@
-package com.ebchinatech.util;
+package com.datah.util;
 
 public class MergeFileConstant {
 
     final static String DRIVER_MEMORY = "driver-memory";
     final static String EXECUTOR_MEMORY = "executor-memory";
     final static String EXECUTOR_CORES = "executor-cores";
+    // 文件合并后的大小
+    final public static String SPLIT_MAXSIZE = "spark.hadoop.mapreduce.input.fileinputformat.split.maxsize";
     //手动调整资源
     final static String NUM_EXECUTORS = "num-executors";
     //spark.default.parallelism

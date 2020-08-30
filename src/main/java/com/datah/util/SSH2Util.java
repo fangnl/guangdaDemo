@@ -1,4 +1,4 @@
-package com.ebchinatech.util;
+package com.datah.util;
 
 import com.jcraft.jsch.*;
 import org.apache.commons.lang.StringUtils;
