@@ -17,7 +17,7 @@ public class MergeFilePath {
     //每个executor 核数 --executor-cores
     private String executorCores;
     //一共几个executor  --num-executors
-    private String numExecutors;
+    private int numExecutors=3;
     //并行度的设置 spark.default.parallelism
     private String parallelism;
     // spark.executor.memoryOverhead 对executor堆内存的设置
@@ -121,7 +121,6 @@ public class MergeFilePath {
 
         String shellPath = PropertiesUtil.getValue(MergeFileConstant.SHELL_PATH);
         //根据文件的元数据调整spark资源的情况
-        //todo
         StringBuffer command = new StringBuffer();
         command.append("source /etc/profile" + "\n");
         command.append("cd /opt/spark-2.3.1/bin/" + "\n");
@@ -131,23 +130,27 @@ public class MergeFilePath {
         command.append("--" + MergeFileConstant.EXECUTOR_MEMORY + " ").append(PropertiesUtil.getValue(MergeFileConstant.EXECUTOR_MEMORY)).append(" ");
         command.append("--" + MergeFileConstant.EXECUTOR_CORES + " ").append(PropertiesUtil.getValue(MergeFileConstant.EXECUTOR_CORES)).append(" ");
         // command.append("--conf " + MergeFileConstant.SCHEDULER_MODEL + "=").append("FAIR").append(" "); //yarn集群配置并行执行之后这个不用配置
-        boolean dynamic = Boolean.parseBoolean(PropertiesUtil.getValue(MergeFileConstant.DYNAMIC_SWITCH));
-        if (!dynamic) {
-            //手动配置
-            command.append("--" + MergeFileConstant.NUM_EXECUTORS + " ").append(PropertiesUtil.getValue(MergeFileConstant.NUM_EXECUTORS)).append(" ");
-        } else {
-            //动态资源分配
-            command.append("--conf " + MergeFileConstant.DYNAMIC_ALLOCATION + "=").append("true").append(" ");
-            command.append("--conf " + MergeFileConstant.SHUFFLE_SERVICE_ENABLE + "=").append("true").append(" ");
-            command.append("--conf " + MergeFileConstant.MAX_EXECUTORS + "=").append(PropertiesUtil.getValue(MergeFileConstant.MAX_EXECUTORS)).append(" ");
-            command.append("--conf " + MergeFileConstant.MIN_EXECUTORS + "=").append(PropertiesUtil.getValue(MergeFileConstant.MIN_EXECUTORS)).append(" ");
-        }
+        //根据数据大小选择executor的数量 每1G一个executor
+       numExecutors = (int) Math.max((fileLength / Math.pow(1024,3)), 3);
+
+        command.append("--" + MergeFileConstant.NUM_EXECUTORS + " ").append(numExecutors).append(" ");
+        //动态资源分配
+        command.append("--conf " + MergeFileConstant.DYNAMIC_ALLOCATION + "=").append("true").append(" ");
+        command.append("--conf " + MergeFileConstant.SHUFFLE_SERVICE_ENABLE + "=").append("true").append(" ");
         try {
-            command.append("--conf " + MergeFileConstant.SPLIT_MAXSIZE + "=").append(PropertiesUtil.getValue(MergeFileConstant.SPLIT_MAXSIZE)).append(" ");
+            String maxExecutors = PropertiesUtil.getValue(MergeFileConstant.MAX_EXECUTORS);
+            command.append("--conf " + MergeFileConstant.MAX_EXECUTORS + "=").append(maxExecutors).append(" ");
         } catch (MissingResourceException e) {
             logger.info(e.getMessage());
-            String substring = command.substring(0, command.lastIndexOf("--conf"));
-            command = new StringBuffer(substring);
+        }
+
+//        command.append("--conf " + MergeFileConstant.MIN_EXECUTORS + "=").append(PropertiesUtil.getValue(MergeFileConstant.MIN_EXECUTORS)).append(" ");
+
+        try {
+            String splitMaxSize = PropertiesUtil.getValue(MergeFileConstant.SPLIT_MAXSIZE);
+            command.append("--conf " + MergeFileConstant.SPLIT_MAXSIZE + "=").append(splitMaxSize).append(" ");
+        } catch (MissingResourceException e) {
+            logger.info(e.getMessage());
         }
         command.append("--conf " + MergeFileConstant.PARALLELISM + "=").append(PropertiesUtil.getValue(MergeFileConstant.PARALLELISM)).append(" ");
         command.append(PropertiesUtil.getValue(MergeFileConstant.JAR_LOCATION)).append(" ").append(paths).append(" ").append(outPath);

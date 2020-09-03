@@ -18,7 +18,7 @@ public class MergeFileConstant {
     final static String DYNAMIC_ALLOCATION = "spark.dynamicAllocation.enabled";
     final static String SHUFFLE_SERVICE_ENABLE = "spark.shuffle.service.enabled";
     final static String MIN_EXECUTORS = "spark.dynamicAllocation.minExecutors";
-    final static String MAX_EXECUTORS = "spark.dynamicAllocation.maxExecutors";
+   public final static String MAX_EXECUTORS = "spark.dynamicAllocation.maxExecutors";
     //spark.scheduler.mode 资源调度模式
     final static String SCHEDULER_MODEL = "spark.scheduler.mode";
     //配置文件自定义配置选项

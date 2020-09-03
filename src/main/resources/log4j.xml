@@ -60,7 +60,6 @@
         <!-- 设置当日志文件达到此阈值的时候自动回滚，单位可以是KB，MB，GB，默认单位是KB，默认值是：10MB -->
         <param name="MaxFileSize" value="10MB"/>
 
-
         <!-- 设置日志输出的样式 -->
         <layout class="org.apache.log4j.PatternLayout">
             <!-- 日志输出格式 -->
