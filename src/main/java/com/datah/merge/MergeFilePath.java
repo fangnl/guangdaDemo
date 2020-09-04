@@ -1,5 +1,6 @@
-package com.datah.util;
+package com.datah.merge;
 
+import com.datah.util.*;
 import org.apache.hadoop.fs.*;
 import org.apache.hadoop.io.IOUtils;
 import org.slf4j.Logger;
@@ -61,8 +62,10 @@ public class MergeFilePath {
 
     //查找所有文件的路径并且计算文件的大小
     private List<String> getFile(String path) throws IOException {
+
         FileStatus[] listStatus = fileSystem.listStatus(new Path(path));
-        if (listStatus == null || listStatus.length < 0)
+
+        if (listStatus.length < 0||listStatus == null  )
             return null;
 
         for (FileStatus status : listStatus) {
