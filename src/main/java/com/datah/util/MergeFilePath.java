@@ -129,22 +129,9 @@ public class MergeFilePath {
         command.append("--" + MergeFileConstant.DRIVER_MEMORY + " ").append(PropertiesUtil.getValue(MergeFileConstant.DRIVER_MEMORY)).append(" ");
         command.append("--" + MergeFileConstant.EXECUTOR_MEMORY + " ").append(PropertiesUtil.getValue(MergeFileConstant.EXECUTOR_MEMORY)).append(" ");
         command.append("--" + MergeFileConstant.EXECUTOR_CORES + " ").append(PropertiesUtil.getValue(MergeFileConstant.EXECUTOR_CORES)).append(" ");
-        // command.append("--conf " + MergeFileConstant.SCHEDULER_MODEL + "=").append("FAIR").append(" "); //yarn集群配置并行执行之后这个不用配置
         //根据数据大小选择executor的数量 每1G一个executor
-       numExecutors = (int) Math.max((fileLength / Math.pow(1024,3)), 3);
-
+       numExecutors = (int) Math.max((fileLength / Math.pow(1024,3)), 4);
         command.append("--" + MergeFileConstant.NUM_EXECUTORS + " ").append(numExecutors).append(" ");
-        //动态资源分配
-        command.append("--conf " + MergeFileConstant.DYNAMIC_ALLOCATION + "=").append("true").append(" ");
-        command.append("--conf " + MergeFileConstant.SHUFFLE_SERVICE_ENABLE + "=").append("true").append(" ");
-        try {
-            String maxExecutors = PropertiesUtil.getValue(MergeFileConstant.MAX_EXECUTORS);
-            command.append("--conf " + MergeFileConstant.MAX_EXECUTORS + "=").append(maxExecutors).append(" ");
-        } catch (MissingResourceException e) {
-            logger.info(e.getMessage());
-        }
-
-//        command.append("--conf " + MergeFileConstant.MIN_EXECUTORS + "=").append(PropertiesUtil.getValue(MergeFileConstant.MIN_EXECUTORS)).append(" ");
 
         try {
             String splitMaxSize = PropertiesUtil.getValue(MergeFileConstant.SPLIT_MAXSIZE);
@@ -152,7 +139,6 @@ public class MergeFilePath {
         } catch (MissingResourceException e) {
             logger.info(e.getMessage());
         }
-        command.append("--conf " + MergeFileConstant.PARALLELISM + "=").append(PropertiesUtil.getValue(MergeFileConstant.PARALLELISM)).append(" ");
         command.append(PropertiesUtil.getValue(MergeFileConstant.JAR_LOCATION)).append(" ").append(paths).append(" ").append(outPath);
         logger.info("连接Linux调用工具类");
         SSH2Util ssh2Util = new SSH2Util(PropertiesUtil.getValue("linux.host"), PropertiesUtil.getValue("linux.userName"), PropertiesUtil.getValue("linux.password"), 22);
