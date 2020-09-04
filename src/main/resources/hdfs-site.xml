@@ -35,12 +35,12 @@
   <!-- 指定nn1地址和端口号  -->
   <property>
     <name>dfs.namenode.rpc-address.mycluster.nn1</name>
-    <value>192.168.163.71:8020</value>
+    <value>node1:8020</value>
   </property>
   <!-- 指定nn2地址和端口号  -->
   <property>
     <name>dfs.namenode.rpc-address.mycluster.nn2</name>
-    <value>192.168.163.72:8020</value>
+    <value>node2:8020</value>
   </property>
   <!-- 指定客户端查找active的namenode的策略：
               	       	  会给所有namenode发请求，以决定哪个是active的 -->
@@ -51,7 +51,7 @@
   <!-- 指定三台journal node服务器的地址 -->
   <property>
     <name>dfs.namenode.shared.edits.dir</name>
-    <value>qjournal://192.168.163.71:8485;192.168.163.72:8485;192.168.163.73:8485/mycluster</value>
+    <value>qjournal://node1:8485;node2:8485;node3:8485/mycluster</value>
   </property>
   <property>
     <name>dfs.journalnode.edits.dir</name>

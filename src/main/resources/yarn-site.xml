@@ -13,44 +13,94 @@
   limitations under the License. See accompanying LICENSE file.
 -->
 <configuration>
-
-<!-- Site specific YARN configuration properties -->
-<!-- 让yarn的容器支持mapreduce的洗牌，开启shuffle服务 -->
-<property>
-   <name>yarn.nodemanager.aux-services</name>
-   <value>mapreduce_shuffle</value>
-</property>
-<!-- 启用resourcemanager的HA -->
-<property>
-   <name>yarn.resourcemanager.ha.enabled</name>
-   <value>true</value>
- </property>
-<!-- 指定zookeeper集群的各个节点地址和端口号 -->
- <property>
-   <name>yarn.resourcemanager.zk-address</name>
-   <value>192.168.163.72:2181,192.168.163.73:2181,192.168.163.74:2181</value>
- </property>
-
-<!-- 标识集群，以确保 RM 不会接管另一个集群的活动。 -->
- <property>
-   <name>yarn.resourcemanager.cluster-id</name>
-   <value>cluster1</value>
- </property>
-<!-- RM HA的两个resourcemanager的名字 -->
- <property>
-   <name>yarn.resourcemanager.ha.rm-ids</name>
-   <value>rm1,rm2</value>
- </property>
-
-<!-- 指定rm1的reourcemanager进程所在的主机名称 -->
- <property>
-   <name>yarn.resourcemanager.hostname.rm1</name>
-   <value>192.168.163.73</value>
- </property>
-<!-- 指定rm2的reourcemanager进程所在的主机名称 -->
- <property>
-   <name>yarn.resourcemanager.hostname.rm2</name>
-   <value>192.168.163.74</value>
- </property>
-
+  <!-- Site specific YARN configuration properties -->
+  <!-- 让yarn的容器支持mapreduce的洗牌，开启shuffle服务 -->
+  <property>
+    <name>yarn.nodemanager.aux-services</name>
+    <value>mapreduce_shuffle</value>
+  </property>
+  <!-- 启用resourcemanager的HA -->
+  <property>
+    <name>yarn.resourcemanager.ha.enabled</name>
+    <value>true</value>
+  </property>
+  <!-- 指定zookeeper集群的各个节点地址和端口号 -->
+  <property>
+    <name>yarn.resourcemanager.zk-address</name>
+    <value>node2:2181,node3:2181,node4:2181</value>
+  </property>
+  <!-- 标识集群，以确保 RM 不会接管另一个集群的活动。 -->
+  <property>
+    <name>yarn.resourcemanager.cluster-id</name>
+    <value>cluster1</value>
+  </property>
+  <!-- RM HA的两个resourcemanager的名字 -->
+  <property>
+    <name>yarn.resourcemanager.ha.rm-ids</name>
+    <value>rm1,rm2</value>
+  </property>
+  <!-- 指定rm1的reourcemanager进程所在的主机名称 -->
+  <property>
+    <name>yarn.resourcemanager.hostname.rm1</name>
+    <value>node3</value>
+  </property>
+  <!-- 指定rm2的reourcemanager进程所在的主机名称 -->
+  <property>
+    <name>yarn.resourcemanager.hostname.rm2</name>
+    <value>node4</value>
+  </property>
+  <!--关闭虚拟内存-->
+  <property>
+    <name>yarn.nodemanager.vmem-check-enabled</name>
+    <value>false</value>
+  </property>
+  <property>
+    <name>yarn.nodemanager.pmem-check-enabled</name>
+    <value>false</value>
+  </property>
+  <!-- applicationmaster任务失败的重试的次数  -->
+  <property>
+    <name>yarn.resourcemanager.am.max-attempts</name>
+    <value>4</value>
+  </property>
+  <property>
+    <name>yarn.log-aggregation-enable</name>
+    <value>true</value>
+  </property>
+  <!--配置每台节点的内存-->
+  <property>
+    <name>yarn.nodemanager.resource.memory-mb</name>
+    <value>4096</value>
+  </property>
+  <!--配置每台节点的core-->
+  <property>
+    <name>yarn.nodemanager.resource.cpu-vcores</name>
+    <value>4</value>
+  </property>
+  <!--调度器-->
+  <property>
+    <name>yarn.resourcemanager.scheduler.class</name>
+    <value>org.apache.hadoop.yarn.server.resourcemanager.scheduler.fair.FairScheduler</value>
+  </property>
+  <property>
+    <name>yarn.scheduler.fair.preemption</name>
+    <value>true</value>
+  </property>
+  <property>
+    <name>yarn.scheduler.fair.preemption.cluster-utilization-threshold</name>
+    <value>1.0</value>
+  </property>
+  <!--自动提交-->
+  <property>
+    <name>yarn.nodemanager.aux-services</name>
+    <value>mapreduce_shuffle,spark_shuffle</value>
+  </property>
+  <property>
+    <name>yarn.nodemanager.aux-services.spark_shuffle.class</name>
+    <value>org.apache.spark.network.yarn.YarnShuffleService</value>
+  </property>
+  <property>
+    <name>spark.shuffle.service.port</name>
+    <value>7337</value>
+  </property>
 </configuration>
