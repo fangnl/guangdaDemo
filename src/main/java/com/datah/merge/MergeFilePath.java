@@ -12,25 +12,15 @@ import java.util.MissingResourceException;
 
 public class MergeFilePath {
     //driver的内存 --driver-memory
-    private String driverMemory;
+   // private String driverMemory;
     //每个executor 内存 --executor-memory
-    private String executorMemory;
+   // private String executorMemory;
     //每个executor 核数 --executor-cores
-    private String executorCores;
+   // private String executorCores;
     //一共几个executor  --num-executors
-    private int numExecutors=3;
-    //并行度的设置 spark.default.parallelism
-    private String parallelism;
+    private int numExecutors;
     // spark.executor.memoryOverhead 对executor堆内存的设置
-    private String executorMemoryOverhead;
-    //spark.dynamicAllocation.enabled 是否自动调整资源
-    private String dynamicAllocation;
-    //spark.shuffle.service.enabled 开启自动调整shuffle必须被开启
-    private String shuffleServiceEnabled;
-    //spark.dynamicAllocation.minExecutors
-    private String minExecutors;
-    //spark.dynamicAllocation.maxExecutors
-    private String maxExecutors;
+  //  private String executorMemoryOverhead;
 
 
     public Logger logger = LogUtil.getLogger();
@@ -65,7 +55,7 @@ public class MergeFilePath {
 
         FileStatus[] listStatus = fileSystem.listStatus(new Path(path));
 
-        if (listStatus.length < 0||listStatus == null  )
+        if (listStatus.length < 0 || listStatus == null)
             return null;
 
         for (FileStatus status : listStatus) {
@@ -133,7 +123,7 @@ public class MergeFilePath {
         command.append("--" + MergeFileConstant.EXECUTOR_MEMORY + " ").append(PropertiesUtil.getValue(MergeFileConstant.EXECUTOR_MEMORY)).append(" ");
         command.append("--" + MergeFileConstant.EXECUTOR_CORES + " ").append(PropertiesUtil.getValue(MergeFileConstant.EXECUTOR_CORES)).append(" ");
         //根据数据大小选择executor的数量 每1G一个executor
-       numExecutors = (int) Math.max((fileLength / Math.pow(1024,3)), 4);
+        numExecutors = (int) Math.max((fileLength / Math.pow(1024, 3)), 4);
         command.append("--" + MergeFileConstant.NUM_EXECUTORS + " ").append(numExecutors).append(" ");
 
         try {
